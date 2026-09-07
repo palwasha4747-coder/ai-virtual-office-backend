@@ -6,6 +6,10 @@ import { AppService } from './app.service';
 import { EmployeesModule } from './employees/employees.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { ProductivityModule } from './productivity/productivity.module';
+import { GoalsModule } from './goals/goals.module';
+import { ActivityModule } from './activity/activity.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -22,6 +26,10 @@ import { CalendarModule } from './calendar/calendar.module';
     EmployeesModule,
     DashboardModule,
     CalendarModule,
+    ProductivityModule,
+    GoalsModule,
+    ActivityModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
