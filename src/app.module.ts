@@ -10,6 +10,9 @@ import { ProductivityModule } from './productivity/productivity.module';
 import { GoalsModule } from './goals/goals.module';
 import { ActivityModule } from './activity/activity.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { CopilotModule } from './copilot/copilot.module';
+import { TasksModule } from './tasks/tasks.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -30,6 +33,9 @@ import { NotificationsModule } from './notifications/notifications.module';
     GoalsModule,
     ActivityModule,
     NotificationsModule,
+    CopilotModule,
+    TasksModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -3,16 +3,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { TaskEntity } from '../tasks/entities/task.entity/task.entity';
+import { CalendarEventEntity } from '../calendar/entities/calendar-event.entity/calendar-event.entity';
 
 @Injectable()
 export class CopilotService {
   constructor(
     @InjectRepository(TaskEntity)
     private readonly taskRepository: Repository<TaskEntity>,
+
+    @InjectRepository(CalendarEventEntity)
+    private readonly calendarRepository: Repository<CalendarEventEntity>,
   ) {}
 
   async processCommand(command: string) {
-    const normalizedCommand = command.trim().toLowerCase();
+    const normalizedCommand =
+      command.trim().toLowerCase();
 
     if (!normalizedCommand) {
       return {
@@ -32,14 +37,6 @@ export class CopilotService {
           createdAt: 'DESC',
         },
       });
-
-      if (tasks.length === 0) {
-        return {
-          success: true,
-          type: 'task',
-          message: 'You currently have no tasks.',
-        };
-      }
 
       if (
         normalizedCommand.includes('pending') ||
@@ -99,17 +96,40 @@ export class CopilotService {
       };
     }
 
-    // SCHEDULE
+    // CALENDAR
     if (
       normalizedCommand.includes('schedule') ||
+      normalizedCommand.includes('calendar') ||
       normalizedCommand.includes('meeting') ||
-      normalizedCommand.includes('calendar')
+      normalizedCommand.includes('appointment')
     ) {
+      const events =
+        await this.calendarRepository.find({
+          order: {
+            id: 'ASC',
+          },
+        });
+
+      if (events.length === 0) {
+        return {
+          success: true,
+          type: 'calendar',
+          message:
+            'There are no calendar events scheduled.',
+        };
+      }
+
+      const schedule = events
+        .map(
+          (event) =>
+            `${event.time} - ${event.title} (${event.detail})`,
+        )
+        .join('; ');
+
       return {
         success: true,
         type: 'calendar',
-        message:
-          'I can help you schedule and manage your workspace calendar.',
+        message: `Your current schedule has ${events.length} activities: ${schedule}.`,
       };
     }
 
@@ -149,15 +169,14 @@ export class CopilotService {
         success: true,
         type: 'general',
         message:
-          'Hello Palwasha! I am your AI Co-Pilot. I can now read your real workspace tasks and help you manage them.',
+          'Hello Palwasha! I am your AI Co-Pilot. I can read your real tasks and calendar.',
       };
     }
 
-    // DEFAULT
     return {
       success: true,
       type: 'general',
-      message: `I received your command: "${command}". Try asking about your tasks, pending tasks, completed tasks, projects, documents, or schedule.`,
+      message: `I received your command: "${command}". Try asking about your tasks, pending tasks, completed tasks, schedule, meetings, projects, or documents.`,
     };
   }
 }
