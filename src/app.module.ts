@@ -15,6 +15,7 @@ import { CopilotModule } from './copilot/copilot.module';
 import { TasksModule } from './tasks/tasks.module';
 import { ProjectsModule } from './projects/projects.module';
 import { AIAssistantModule } from './ai-assistant/ai-assistant.module';
+import { PcControlModule } from './pc-control/pc-control.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AIAssistantModule } from './ai-assistant/ai-assistant.module';
     TasksModule,
     ProjectsModule,
     AIAssistantModule,
+    PcControlModule,
   ],
   controllers: [AppController],
   providers: [AppService],
