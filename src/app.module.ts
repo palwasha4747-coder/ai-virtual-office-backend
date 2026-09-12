@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
 import { EmployeesModule } from './employees/employees.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { CalendarModule } from './calendar/calendar.module';
@@ -13,6 +14,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { CopilotModule } from './copilot/copilot.module';
 import { TasksModule } from './tasks/tasks.module';
 import { ProjectsModule } from './projects/projects.module';
+import { AIAssistantModule } from './ai-assistant/ai-assistant.module';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { ProjectsModule } from './projects/projects.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+
     EmployeesModule,
     DashboardModule,
     CalendarModule,
@@ -36,6 +39,7 @@ import { ProjectsModule } from './projects/projects.module';
     CopilotModule,
     TasksModule,
     ProjectsModule,
+    AIAssistantModule,
   ],
   controllers: [AppController],
   providers: [AppService],
