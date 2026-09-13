@@ -1,3 +1,4 @@
+
 import { Injectable } from '@nestjs/common';
 import { execFile } from 'child_process';
 
@@ -160,12 +161,178 @@ export class PcControlService {
     }
   }
 
-  async volumeControl() {
-    return {
-      success: false,
-      action: 'volume-control',
-      message:
-        'Volume control requires a volume level from the frontend.',
-    };
+  async volumeControl(level: number) {
+    const safeLevel = Math.max(
+      0,
+      Math.min(100, Number(level)),
+    );
+
+    if (!Number.isFinite(safeLevel)) {
+      return {
+        success: false,
+        action: 'volume-control',
+        message: 'Invalid volume level.',
+      };
+    }
+
+    const volume = Math.round(safeLevel);
+
+    const powerShellScript = `
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+
+public class AudioVolumeControl
+{
+    [ComImport]
+    [Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
+    private class MMDeviceEnumerator
+    {
+    }
+
+    [ComImport]
+    [Guid("A95664D2-9614-4F35-A746-DE8DB63617E6")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IMMDeviceEnumerator
+    {
+        int EnumAudioEndpoints(
+            int dataFlow,
+            int stateMask,
+            out IntPtr devices
+        );
+
+        int GetDefaultAudioEndpoint(
+            int dataFlow,
+            int role,
+            out IMMDevice endpoint
+        );
+    }
+
+    [ComImport]
+    [Guid("D666063F-1587-4E43-81F1-B948E807363F")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IMMDevice
+    {
+        int Activate(
+            ref Guid id,
+            int clsCtx,
+            IntPtr activationParams,
+            out IAudioEndpointVolume endpoint
+        );
+    }
+
+    [ComImport]
+    [Guid("5CDF2C82-841E-4546-9722-0CF74078229A")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IAudioEndpointVolume
+    {
+        int RegisterControlChangeNotify(
+            IntPtr notify
+        );
+
+        int UnregisterControlChangeNotify(
+            IntPtr notify
+        );
+
+        int GetChannelCount(
+            out uint count
+        );
+
+        int SetMasterVolumeLevel(
+            float levelDB,
+            Guid eventContext
+        );
+
+        int SetMasterVolumeLevelScalar(
+            float level,
+            Guid eventContext
+        );
+
+        int GetMasterVolumeLevel(
+            out float levelDB
+        );
+
+        int GetMasterVolumeLevelScalar(
+            out float level
+        );
+
+        int SetChannelVolumeLevel(
+            uint channel,
+            float levelDB,
+            Guid eventContext
+        );
+
+        int SetChannelVolumeLevelScalar(
+            uint channel,
+            float level,
+            Guid eventContext
+        );
+    }
+
+    public static void SetVolume(float volume)
+    {
+        var enumerator =
+            (IMMDeviceEnumerator)new MMDeviceEnumerator();
+
+        IMMDevice device;
+
+        enumerator.GetDefaultAudioEndpoint(
+            0,
+            1,
+            out device
+        );
+
+        Guid iid =
+            typeof(IAudioEndpointVolume).GUID;
+
+        IAudioEndpointVolume endpoint;
+
+        device.Activate(
+            ref iid,
+            23,
+            IntPtr.Zero,
+            out endpoint
+        );
+
+        endpoint.SetMasterVolumeLevelScalar(
+            volume,
+            Guid.Empty
+        );
+    }
+}
+"@
+
+[AudioVolumeControl]::SetVolume($volume)
+`;
+
+    try {
+      await this.runWindowsCommand('powershell.exe', [
+        '-NoProfile',
+        '-NonInteractive',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-Command',
+        `$volume = ${volume / 100}; ${powerShellScript}`,
+      ]);
+
+      return {
+        success: true,
+        action: 'volume-control',
+        level: volume,
+        message: `System volume set to ${volume}%.`,
+      };
+    } catch (error) {
+      console.error('Volume control error:', error);
+
+      return {
+        success: false,
+        action: 'volume-control',
+        level: volume,
+        message:
+          error instanceof Error
+            ? `Could not change system volume: ${error.message}`
+            : 'Could not change system volume.',
+      };
+    }
   }
 }

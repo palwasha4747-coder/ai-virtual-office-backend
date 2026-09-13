@@ -1,9 +1,16 @@
-import { Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+} from '@nestjs/common';
+
 import { PcControlService } from './pc-control.service';
 
 @Controller('pc-control')
 export class PcControlController {
-  constructor(private readonly pcControlService: PcControlService) {}
+  constructor(
+    private readonly pcControlService: PcControlService,
+  ) {}
 
   @Post('chrome')
   openChrome() {
@@ -41,7 +48,7 @@ export class PcControlController {
   }
 
   @Post('volume')
-  volumeControl() {
-    return this.pcControlService.volumeControl();
+  volumeControl(@Body() body: { level: number }) {
+    return this.pcControlService.volumeControl(body.level);
   }
 }
