@@ -17,6 +17,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { AIAssistantModule } from './ai-assistant/ai-assistant.module';
 import { PcControlModule } from './pc-control/pc-control.module';
 import { ReportsModule } from './reports/reports.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ReportsModule } from './reports/reports.module';
     AIAssistantModule,
     PcControlModule,
     ReportsModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
