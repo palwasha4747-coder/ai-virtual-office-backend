@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
@@ -18,9 +19,14 @@ import { AIAssistantModule } from './ai-assistant/ai-assistant.module';
 import { PcControlModule } from './pc-control/pc-control.module';
 import { ReportsModule } from './reports/reports.module';
 import { SettingsModule } from './settings/settings.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -46,6 +52,7 @@ import { SettingsModule } from './settings/settings.module';
     PcControlModule,
     ReportsModule,
     SettingsModule,
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
