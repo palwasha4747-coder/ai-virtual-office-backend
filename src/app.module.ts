@@ -20,6 +20,7 @@ import { PcControlModule } from './pc-control/pc-control.module';
 import { ReportsModule } from './reports/reports.module';
 import { SettingsModule } from './settings/settings.module';
 import { DocumentsModule } from './documents/documents.module';
+import { AIAgentsModule } from './ai-agents/ai-agents.module';
 
 @Module({
   imports: [
@@ -53,8 +54,15 @@ import { DocumentsModule } from './documents/documents.module';
     ReportsModule,
     SettingsModule,
     DocumentsModule,
+    AIAgentsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+
+  controllers: [
+    AppController,
+  ],
+
+  providers: [
+    AppService,
+  ],
 })
 export class AppModule {}
