@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -21,6 +22,7 @@ import { ReportsModule } from './reports/reports.module';
 import { SettingsModule } from './settings/settings.module';
 import { DocumentsModule } from './documents/documents.module';
 import { AIAgentsModule } from './ai-agents/ai-agents.module';
+import { WorkflowsModule } from './workflows/workflows.module';
 
 @Module({
   imports: [
@@ -55,6 +57,7 @@ import { AIAgentsModule } from './ai-agents/ai-agents.module';
     SettingsModule,
     DocumentsModule,
     AIAgentsModule,
+    WorkflowsModule,
   ],
 
   controllers: [
