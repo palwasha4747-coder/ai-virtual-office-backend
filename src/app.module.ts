@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -14,17 +15,26 @@ import { CopilotModule } from './copilot/copilot.module';
 import { TasksModule } from './tasks/tasks.module';
 import { ProjectsModule } from './projects/projects.module';
 
+const databaseUrl = process.env.DATABASE_URL;
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'bcsf23e05',
-      database: 'ai_virtual_office',
+      ...(databaseUrl
+        ? {
+            url: databaseUrl,
+            ssl: { rejectUnauthorized: false },
+          }
+        : {
+            host: process.env.DB_HOST || 'localhost',
+            port: Number(process.env.DB_PORT || 5432),
+            username: process.env.DB_USERNAME || 'postgres',
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME || 'ai_virtual_office',
+          }),
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
     }),
     EmployeesModule,
     DashboardModule,
