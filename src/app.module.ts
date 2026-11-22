@@ -34,7 +34,7 @@ const databaseUrl = process.env.DATABASE_URL;
             database: process.env.DB_NAME || 'ai_virtual_office',
           }),
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: true,
     }),
     EmployeesModule,
     DashboardModule,
